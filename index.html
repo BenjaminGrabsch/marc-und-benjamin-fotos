@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Marc &amp; Benjamin</title>
+  <meta name="description" content="Teilt eure Fotos und Videos mit uns.">
+  <meta property="og:title" content="Marc &amp; Benjamin">
+  <meta property="og:description" content="Teilt eure Fotos und Videos mit uns.">
+  <meta name="theme-color" content="#F2F3EF" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#131918" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gloock&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F2F3EF;
+      --card: #FFFFFF;
+      --ink: #1E2B2A;
+      --muted: #5E6A67;
+      --line: #DCE0D9;
+      --accent: #2F5D50;
+      --on-accent: #FFFFFF;
+      --ok: #2F7D4F;
+      --err: #B3261E;
+      --display: 'Gloock', Georgia, 'Times New Roman', serif;
+      --body: 'Figtree', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #131918; --card: #1B2321; --ink: #E7ECE9; --muted: #9CA8A4;
+        --line: #2B3533; --ok: #6BC28F; --err: #F2968F;
+      }
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body {
+      background: var(--bg); color: var(--ink);
+      font: 16px/1.55 var(--body); -webkit-font-smoothing: antialiased;
+    }
+    [hidden] { display: none !important; }
+    button { font: inherit; color: inherit; }
+
+    .wrap {
+      max-width: 34rem; margin: 0 auto;
+      padding: calc(1.25rem + env(safe-area-inset-top, 0px)) calc(1.25rem + env(safe-area-inset-right, 0px))
+               calc(3rem + env(safe-area-inset-bottom, 0px)) calc(1.25rem + env(safe-area-inset-left, 0px));
+    }
+
+    .hero-img {
+      display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover;
+      border-radius: 1.25rem; margin-bottom: 1.75rem;
+    }
+    header { text-align: center; }
+    h1 {
+      font: 400 clamp(2.4rem, 11vw, 3.4rem)/1.05 var(--display);
+      letter-spacing: -0.01em; margin: 0.5rem 0 0.6rem; text-wrap: balance;
+    }
+    .sub { color: var(--muted); margin: 0 0 1rem; font-weight: 500; }
+    .welcome { margin: 0 auto; max-width: 26rem; text-wrap: pretty; }
+
+    .field { margin: 2rem auto 0; max-width: 30rem; }
+    .field label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.4rem; }
+    .field input {
+      width: 100%; font: inherit; font-size: 1rem; padding: 0.8rem 1rem;
+      border-radius: 0.75rem; border: 1px solid var(--line);
+      background: var(--card); color: var(--ink);
+    }
+    .field input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+    /* Auslöser-Knopf mit Fortschrittsring */
+    .sr { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; clip: rect(0 0 0 0); }
+    .picker {
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+      margin-top: 2.25rem; cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
+    .shutter { position: relative; width: 11.5rem; height: 11.5rem; }
+    .ringsvg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+    .ring-bg { fill: none; stroke: var(--line); stroke-width: 5; }
+    .ring { fill: none; stroke: var(--accent); stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 0.25s linear; }
+    .core {
+      position: absolute; inset: 13px; border-radius: 50%;
+      background: var(--accent); color: var(--on-accent);
+      display: grid; place-items: center;
+      box-shadow: inset 0 0 0 7px rgba(255, 255, 255, 0.13);
+      transition: transform 0.15s ease;
+    }
+    .picker:active .core { transform: scale(0.96); }
+    #file:focus-visible + .picker .core { outline: 3px solid var(--ink); outline-offset: 5px; }
+    .core svg { width: 3rem; height: 3rem; }
+    .pct { font: 400 2.2rem/1 var(--display); font-variant-numeric: tabular-nums; }
+    .pick-label { font-weight: 600; font-size: 1.1rem; margin-top: 1.1rem; }
+    .pick-hint { color: var(--muted); font-size: 0.9rem; }
+
+    .status { text-align: center; min-height: 1.5em; margin: 1.25rem 0 0; color: var(--muted); text-wrap: balance; }
+    .status.done { color: var(--ink); font-weight: 600; }
+
+    /* Upload-Liste */
+    .list { list-style: none; padding: 0; margin: 1.75rem 0 0; display: grid; gap: 0.5rem; }
+    .item {
+      display: grid; grid-template-columns: 3.25rem 1fr; gap: 0.85rem; align-items: center;
+      background: var(--card); border: 1px solid var(--line); border-radius: 0.9rem; padding: 0.6rem;
+    }
+    .thumb {
+      width: 3.25rem; height: 3.25rem; border-radius: 0.55rem; overflow: hidden;
+      background: var(--line); color: var(--muted); display: grid; place-items: center;
+    }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .thumb svg { width: 1.5rem; height: 1.5rem; }
+    .meta { min-width: 0; }
+    .name { font-weight: 500; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bar { height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; margin: 0.4rem 0 0.3rem; }
+    .bar span { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.25s linear; }
+    .state { font-size: 0.82rem; color: var(--muted); display: flex; justify-content: space-between; gap: 0.5rem; font-variant-numeric: tabular-nums; }
+    .item.ok .bar span { background: var(--ok); }
+    .item.ok .state { color: var(--ok); }
+    .item.err .state, .item.bad .state { color: var(--err); }
+    .linkbtn {
+      font-weight: 600; color: var(--accent); background: none; border: 0; padding: 0;
+      cursor: pointer; text-decoration: underline; white-space: nowrap;
+    }
+
+    .notice {
+      margin-top: 2rem; padding: 1.25rem; text-align: center;
+      background: var(--card); border: 1px solid var(--line); border-radius: 1rem;
+    }
+
+    /* Galerie */
+    .gallery { margin-top: 3.5rem; }
+    .gal-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .gal-head h2 { font: 400 2rem/1.1 var(--display); margin: 0; }
+    .gal-count { color: var(--muted); font-size: 0.9rem; }
+    .gal-actions { display: flex; gap: 1.25rem; margin: 0.6rem 0 1rem; flex-wrap: wrap; font-size: 0.92rem; }
+    .gal-actions a { color: var(--accent); font-weight: 600; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; border-radius: 0.9rem; overflow: hidden; }
+    @media (min-width: 30rem) { .grid { grid-template-columns: repeat(4, 1fr); } }
+    .tile {
+      position: relative; aspect-ratio: 1; padding: 0; border: 0; cursor: pointer;
+      background: var(--line); display: block; overflow: hidden;
+    }
+    .tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .tile:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+    .tile .ph { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); }
+    .tile .ph svg { width: 1.6rem; height: 1.6rem; }
+    .tile .play {
+      position: absolute; right: 6px; bottom: 6px; width: 1.7rem; height: 1.7rem; border-radius: 50%;
+      background: rgba(0, 0, 0, 0.55); color: #fff; display: grid; place-items: center;
+    }
+    .tile .play svg { width: 0.8rem; height: 0.8rem; margin-left: 2px; }
+    .gal-empty { color: var(--muted); text-align: center; padding: 2rem 1rem; background: var(--card); border: 1px dashed var(--line); border-radius: 0.9rem; }
+    .more {
+      display: block; margin: 1.25rem auto 0; padding: 0.7rem 1.4rem; border-radius: 999px;
+      border: 1px solid var(--line); background: var(--card); font-weight: 600; cursor: pointer;
+    }
+
+    /* Vollbildansicht */
+    .lb {
+      position: fixed; inset: 0; z-index: 10; background: rgba(8, 12, 11, 0.95); color: #fff;
+      display: grid; grid-template-rows: auto 1fr auto;
+    }
+    .lb-top, .lb-bottom { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.75rem 1rem; }
+    .lb-top { padding-top: calc(0.75rem + env(safe-area-inset-top, 0px)); }
+    .lb-bottom { padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px)); }
+    .lb-cap { font-size: 0.9rem; opacity: 0.85; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .lb-stage { position: relative; display: grid; place-items: center; min-height: 0; overflow: hidden; }
+    .lb-stage img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+    .lb-stage iframe { width: min(100%, 60rem); height: 100%; border: 0; }
+    .lb-stage .loading { position: absolute; opacity: 0.6; font-size: 0.9rem; }
+    .round {
+      width: 2.75rem; height: 2.75rem; border-radius: 50%; border: 0; cursor: pointer;
+      background: rgba(255, 255, 255, 0.12); color: #fff; display: grid; place-items: center; flex: none;
+    }
+    .round svg { width: 1.25rem; height: 1.25rem; }
+    .round:focus-visible, .dl:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+    .dl {
+      display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.65rem 1.2rem; border-radius: 999px;
+      background: #fff; color: #111; font-weight: 600; text-decoration: none;
+    }
+    .dl svg { width: 1.1rem; height: 1.1rem; }
+
+    .privacy { font-size: 0.8rem; color: var(--muted); text-align: center; margin: 2.5rem auto 0; max-width: 26rem; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ring, .bar span, .core { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <img id="hero" class="hero-img" alt="" hidden>
+    <header>
+      <h1 id="title"></h1>
+      <p id="subtitle" class="sub"></p>
+      <p id="welcome" class="welcome"></p>
+    </header>
+
+    <p id="notice" class="notice" hidden></p>
+    <p id="loading" class="status" hidden>Wird geladen …</p>
+
+    <section id="uploader" hidden>
+      <div id="nameField" class="field">
+        <label for="guest">Dein Name (optional)</label>
+        <input id="guest" type="text" autocomplete="name" maxlength="60" placeholder="z. B. Tante Gabi">
+      </div>
+
+      <input id="file" class="sr" type="file" accept="image/*,video/*" multiple>
+      <label for="file" class="picker">
+        <span class="shutter">
+          <svg class="ringsvg" viewBox="0 0 200 200" aria-hidden="true">
+            <circle class="ring-bg" cx="100" cy="100" r="94"></circle>
+            <circle id="ring" class="ring" cx="100" cy="100" r="94"></circle>
+          </svg>
+          <span class="core">
+            <svg id="coreIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.8l1.4-2h4.6l1.4 2h1.8A2.5 2.5 0 0 1 20 8.5v8A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5z"/>
+              <circle cx="12" cy="12.5" r="3.5"/>
+            </svg>
+            <span id="corePct" class="pct" hidden></span>
+          </span>
+        </span>
+        <span class="pick-label">Fotos &amp; Videos auswählen</span>
+        <span class="pick-hint">Du kannst mehrere auf einmal auswählen</span>
+      </label>
+
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+      <ul id="list" class="list"></ul>
+    </section>
+
+    <section id="gallery" class="gallery" hidden aria-labelledby="galTitle">
+      <div class="gal-head">
+        <h2 id="galTitle">Galerie</h2>
+        <span id="galCount" class="gal-count"></span>
+      </div>
+      <div class="gal-actions">
+        <button id="galRefresh" class="linkbtn" type="button">Aktualisieren</button>
+        <a id="galFolder" href="#" target="_blank" rel="noopener" hidden>Alle in Google Drive öffnen</a>
+      </div>
+      <div id="grid" class="grid"></div>
+      <p id="galEmpty" class="gal-empty" hidden></p>
+      <button id="galMore" class="more" type="button" hidden>Mehr anzeigen</button>
+    </section>
+
+    <p id="privacy" class="privacy"></p>
+  </main>
+
+  <div id="lb" class="lb" role="dialog" aria-modal="true" aria-label="Foto ansehen" hidden>
+    <div class="lb-top">
+      <span id="lbCap" class="lb-cap"></span>
+      <button id="lbClose" class="round" type="button" aria-label="Schließen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <div id="lbStage" class="lb-stage"></div>
+    <div class="lb-bottom">
+      <button id="lbPrev" class="round" type="button" aria-label="Vorheriges">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></svg>
+      </button>
+      <a id="lbDl" class="dl" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14"/></svg>
+        Herunterladen
+      </a>
+      <button id="lbNext" class="round" type="button" aria-label="Nächstes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // =====================================================
+    //  EINSTELLUNGEN – hier anpassen
+    // =====================================================
+    const SETTINGS = {
+      // /exec-Adresse eures Apps Scripts
+      API_URL: 'https://script.google.com/macros/s/AKfycbzx1FcIIfEBSDJsrvDsYIsxcm9T_5rqhLlFhcthZV4dPzBHwRJTNPbTQDZxJux7uAxv/exec',
+
+      TITLE: 'Marc & Benjamin',
+      SUBTITLE: 'Unser großer Tag',
+      WELCOME: 'Teilt eure schönsten Momente mit uns. Einfach Fotos und Videos auswählen, der Rest passiert automatisch.',
+      PRIVACY: 'Hochgeladene Fotos und Videos sind für alle sichtbar, die diese Seite öffnen, und können dort heruntergeladen werden. Mit dem Hochladen bist du damit einverstanden.',
+
+      ACCENT: '#2F5D50',          // Hauptfarbe
+      HERO_IMAGE: '',             // optional: Dateiname eines Titelbilds im selben Repository, z. B. 'titelbild.jpg'
+      ASK_FOR_NAME: true          // optionales Namensfeld anzeigen
+    };
+    // =====================================================
+
+    let CFG = {};
+
+    (function () {
+      const $ = (s) => document.querySelector(s);
+      const C = 2 * Math.PI * 94;
+      const ICON_PHOTO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="m20.5 16-4.8-4.8L7 19.5"/></svg>';
+      const ICON_VIDEO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2.5"/><path d="m16 10.5 5-3v9l-5-3z"/></svg>';
+      const ICON_PLAY = '<svg viewBox="0 0 10 12" fill="currentColor"><path d="M0 0v12l10-6z"/></svg>';
+
+      // ---------- Inhalte aus der Konfiguration ----------
+      const KEY = new URLSearchParams(location.search).get('k') || '';
+      document.documentElement.style.setProperty('--accent', SETTINGS.ACCENT);
+      document.title = SETTINGS.TITLE;
+      $('#title').textContent = SETTINGS.TITLE;
+      $('#subtitle').textContent = SETTINGS.SUBTITLE;
+      $('#welcome').textContent = SETTINGS.WELCOME;
+      $('#privacy').textContent = SETTINGS.PRIVACY;
+      if (SETTINGS.HERO_IMAGE) { $('#hero').src = SETTINGS.HERO_IMAGE; $('#hero').hidden = false; }
+
+      function showNotice(text) {
+        $('#notice').hidden = false;
+        $('#notice').textContent = text;
+      }
+
+      // =====================================================
+      //  Upload
+      // =====================================================
+      let batch = [];
+      let running = false;
+      let wakeLock = null;
+      let ticker = null;
+      let mode = 'direct';          // 'direct' = Browser sendet direkt an Drive, 'relay' = über das Skript
+      let relayRate = 0.3;          // geschätzte Bytes pro Millisekunde für den Ersatzweg
+      const guestInput = $('#guest');
+      const guest = () => (SETTINGS.ASK_FOR_NAME ? guestInput.value.trim() : '');
+
+      function initUploader() {
+        try { if (sessionStorage.getItem('uploadMode') === 'relay') mode = 'relay'; } catch (e) {}
+        const ring = $('#ring');
+        ring.style.strokeDasharray = C;
+        ring.style.strokeDashoffset = C;
+
+        if (!SETTINGS.ASK_FOR_NAME) $('#nameField').hidden = true;
+        try { guestInput.value = localStorage.getItem('guestName') || ''; } catch (e) {}
+        guestInput.addEventListener('input', () => {
+          try { localStorage.setItem('guestName', guestInput.value); } catch (e) {}
+        });
+
+        $('#file').addEventListener('change', (e) => {
+          addFiles(Array.from(e.target.files || []));
+          e.target.value = '';
+        });
+
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible' && running) keepAwake(true);
+        });
+        window.addEventListener('beforeunload', (e) => {
+          if (running) { e.preventDefault(); e.returnValue = ''; }
+        });
+      }
+
+      function addFiles(files) {
+        if (!files.length) return;
+        if (!running) batch = [];
+        for (const file of files) {
+          const it = { file, done: 0, status: 'wait', error: '', flight: null };
+          const problem = check(file);
+          if (problem) { it.status = 'bad'; it.error = problem; }
+          it.el = buildItem(it);
+          $('#list').prepend(it.el);
+          batch.push(it);
+          paint(it);
+        }
+        overall();
+        processQueue();
+      }
+
+      function check(file) {
+        const ext = (file.name.split('.').pop() || '').toLowerCase();
+        const okType = /^(image|video)\//.test(file.type) || CFG.extensions.includes(ext);
+        if (!okType) return 'Nur Fotos und Videos möglich';
+        if (file.size === 0) return 'Datei ist leer';
+        if (file.size > CFG.maxFileMb * 1024 * 1024) return 'Größer als ' + CFG.maxFileMb + ' MB';
+        return '';
+      }
+
+      async function processQueue() {
+        if (running) return;
+        running = true;
+        keepAwake(true);
+        ticker = setInterval(tick, 250);
+        overall();
+        const takeNext = () => {
+          const it = batch.find((i) => i.status === 'wait');
+          if (it) it.status = 'up';
+          return it;
+        };
+        const worker = async () => {
+          let it;
+          while ((it = takeNext())) await uploadItem(it);
+        };
+        while (batch.some((i) => i.status === 'wait')) {
+          await Promise.all(Array.from({ length: CFG.parallel }, worker));
+        }
+        clearInterval(ticker);
+        running = false;
+        keepAwake(false);
+        overall();
+        if (CFG.showGallery && batch.some((i) => i.status === 'ok')) loadGallery(true, true);
+      }
+
+      async function uploadItem(it) {
+        it.status = 'up'; it.done = 0; it.error = '';
+        paint(it);
+        const f = it.file;
+        try {
+          const s = await retry(() => call('start', {
+            meta: { name: f.name, size: f.size, type: f.type || '', guest: guest() },
+            origin: location.origin
+          }));
+          it.started = true;
+
+          let pos = 0;
+          if (mode === 'direct' && s.url) {
+            try {
+              pos = await directUpload(it, s);
+            } catch (e) {
+              if (!e.blocked) throw e;
+              // Direkter Weg ist in diesem Browser nicht möglich: auf Ersatzweg umschalten
+              mode = 'relay';
+              try { sessionStorage.setItem('uploadMode', 'relay'); } catch (x) {}
+              pos = 0;
+            }
+          }
+          if (pos < f.size) await relayUpload(it, s.id, pos);
+          it.done = f.size;
+          it.status = 'ok';
+        } catch (e) {
+          it.status = 'err';
+          it.error = cleanMsg(e);
+        }
+        it.flight = null;
+        paint(it); overall();
+      }
+
+      // Direkter Weg: Browser sendet die Datei in einem Stück an Google Drive, mit echtem Fortschritt
+      async function directUpload(it, s) {
+        const f = it.file;
+        let pos = 0, attempts = 0, progressed = false, delay = 1500;
+        while (true) {
+          try {
+            const r = await xhrPut(s.url, f, pos, (sent) => {
+              progressed = true;
+              it.done = Math.min(sent, f.size - 1);
+            });
+            if (r.done) return f.size;
+            if (r.next != null) { pos = r.next; continue; }
+            throw Object.assign(new Error('Stand unbekannt'), { status: 0 });
+          } catch (e) {
+            if (e.status === 0 && !progressed && attempts === 0) {
+              throw Object.assign(new Error('Direkter Upload nicht möglich'), { blocked: true });
+            }
+            if (e.status >= 400 && e.status < 500 && e.status !== 408 && e.status !== 429) {
+              throw Object.assign(new Error('Hochladen wurde abgelehnt (' + e.status + '). Bitte erneut versuchen.'), { user: true });
+            }
+            if (++attempts > 6) throw e;
+            await sleep(delay); delay = Math.min(delay * 2, 20000);
+            const st = await retry(() => call('status', { id: s.id }));
+            if (st.done) return f.size;
+            pos = st.next; it.done = pos;
+          }
+        }
+      }
+
+      function xhrPut(url, file, start, onProgress) {
+        return new Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open('PUT', url, true);
+          if (start > 0) xhr.setRequestHeader('Content-Range', 'bytes ' + start + '-' + (file.size - 1) + '/' + file.size);
+          xhr.upload.onprogress = (e) => { if (e.lengthComputable) onProgress(start + e.loaded); };
+          xhr.onload = () => {
+            if (xhr.status === 200 || xhr.status === 201) return resolve({ done: true });
+            if (xhr.status === 308) {
+              const r = xhr.getResponseHeader('Range');
+              return resolve({ done: false, next: r ? parseInt(r.split('-')[1], 10) + 1 : null });
+            }
+            reject(Object.assign(new Error('HTTP ' + xhr.status), { status: xhr.status }));
+          };
+          xhr.onerror = () => reject(Object.assign(new Error('Netzwerkfehler'), { status: 0 }));
+          xhr.send(start > 0 ? file.slice(start) : file);
+        });
+      }
+
+      // Ersatzweg: Teilstücke über das Skript; Fortschritt wird zwischen den Stücken geschätzt
+      async function relayUpload(it, id, pos) {
+        const f = it.file;
+        let offset = pos, stuck = 0;
+        while (offset < f.size) {
+          const end = Math.min(offset + CFG.chunkSize, f.size);
+          const b64 = await readB64(f.slice(offset, end));
+          const at = offset;
+          const t0 = performance.now();
+          it.flight = { from: at, to: end, t0 };
+          const r = await retry(() => call('chunk', { id: id, start: at, data: b64 }));
+          const measured = (end - at) / Math.max(1, performance.now() - t0);
+          relayRate = relayRate * 0.4 + measured * 0.6;
+          it.flight = null;
+          if (r.done) return;
+          if (r.next <= offset) { if (++stuck > 3) throw new Error('Die Übertragung kommt nicht voran.'); }
+          else stuck = 0;
+          offset = r.next;
+          it.done = offset;
+        }
+      }
+
+      function tick() {
+        const now = performance.now();
+        for (const it of batch) {
+          if (it.status !== 'up') continue;
+          if (it.flight) {
+            const span = it.flight.to - it.flight.from;
+            const est = it.flight.from + Math.min(span * 0.95, relayRate * (now - it.flight.t0));
+            it.done = Math.max(it.done, est);
+          }
+          paint(it);
+        }
+        overall();
+      }
+
+      // ---------- Darstellung Upload ----------
+      function buildItem(it) {
+        const li = document.createElement('li');
+        li.className = 'item';
+        const thumb = document.createElement('div');
+        thumb.className = 'thumb';
+        const isVideo = /^video\//.test(it.file.type) || /\.(mov|mp4|m4v|3gp|webm|avi|mkv)$/i.test(it.file.name);
+        if (!isVideo && /^image\//.test(it.file.type)) {
+          const img = document.createElement('img');
+          img.alt = '';
+          img.onerror = () => { thumb.innerHTML = ICON_PHOTO; };
+          img.src = URL.createObjectURL(it.file);
+          thumb.appendChild(img);
+        } else {
+          thumb.innerHTML = isVideo ? ICON_VIDEO : ICON_PHOTO;
+        }
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        meta.innerHTML = '<div class="name"></div><div class="bar"><span></span></div><div class="state"><span class="txt"></span></div>';
+        meta.querySelector('.name').textContent = it.file.name;
+        li.append(thumb, meta);
+        return li;
+      }
+
+      function paint(it) {
+        const el = it.el;
+        const cls = 'item ' + it.status;
+        if (el.className !== cls) el.className = cls;
+        const pct = it.file.size ? Math.floor((it.done / it.file.size) * 100) : 0;
+        el.querySelector('.bar span').style.width = (it.status === 'ok' ? 100 : pct) + '%';
+
+        let text;
+        if (it.status === 'wait') text = 'Wartet, ' + fmtSize(it.file.size);
+        else if (it.status === 'up') text = it.started ? pct + ' % von ' + fmtSize(it.file.size) : 'Wird vorbereitet …';
+        else if (it.status === 'ok') text = 'Hochgeladen';
+        else text = it.error;
+        const txt = el.querySelector('.txt');
+        if (txt.textContent !== text) txt.textContent = text;
+
+        const state = el.querySelector('.state');
+        const btn = state.querySelector('.linkbtn');
+        if (it.status === 'err' && !btn) {
+          const b = document.createElement('button');
+          b.className = 'linkbtn';
+          b.type = 'button';
+          b.textContent = 'Erneut versuchen';
+          b.onclick = () => {
+            it.status = 'wait'; it.done = 0; it.started = false;
+            if (!batch.includes(it)) batch.push(it);
+            paint(it); overall(); processQueue();
+          };
+          state.appendChild(b);
+        } else if (it.status !== 'err' && btn) {
+          btn.remove();
+        }
+      }
+
+      function overall() {
+        const active = batch.filter((i) => i.status !== 'bad');
+        const total = active.reduce((s, i) => s + i.file.size, 0);
+        const done = active.reduce((s, i) => s + (i.status === 'ok' ? i.file.size : i.done), 0);
+        const p = total ? Math.min(1, done / total) : 0;
+        $('#ring').style.strokeDashoffset = C * (1 - p);
+
+        const ok = active.filter((i) => i.status === 'ok').length;
+        const err = active.filter((i) => i.status === 'err').length;
+        const status = $('#status');
+
+        $('#coreIcon').hidden = running;
+        $('#corePct').hidden = !running;
+        $('#corePct').textContent = Math.floor(p * 100) + ' %';
+
+        let msg = '', cls = 'status';
+        if (running) {
+          msg = ok + ' von ' + active.length + (active.length === 1 ? ' Datei' : ' Dateien') +
+            ' hochgeladen. Bitte lass diese Seite geöffnet.';
+        } else if (ok || err) {
+          const name = guest();
+          if (ok) msg = ok + (ok === 1 ? ' Datei ist' : ' Dateien sind') + ' angekommen. Danke' + (name ? ', ' + name : '') + '!';
+          if (err) msg += (msg ? ' ' : '') + err + (err === 1 ? ' Datei konnte' : ' Dateien konnten') + ' nicht hochgeladen werden.';
+          cls = 'status done';
+        }
+        if (status.textContent !== msg) status.textContent = msg;
+        status.className = cls;
+      }
+
+      // =====================================================
+      //  Galerie
+      // =====================================================
+      const gal = { items: [], next: null, loading: false, index: -1 };
+
+      function initGallery() {
+        $('#gallery').hidden = false;
+        if (CFG.folderUrl) { $('#galFolder').href = CFG.folderUrl; $('#galFolder').hidden = false; }
+        $('#galRefresh').addEventListener('click', () => loadGallery(true, true));
+        $('#galMore').addEventListener('click', () => loadGallery(false));
+        $('#lbClose').addEventListener('click', closeLightbox);
+        $('#lbPrev').addEventListener('click', () => step(-1));
+        $('#lbNext').addEventListener('click', () => step(1));
+        document.addEventListener('keydown', (e) => {
+          if ($('#lb').hidden) return;
+          if (e.key === 'Escape') closeLightbox();
+          if (e.key === 'ArrowLeft') step(-1);
+          if (e.key === 'ArrowRight') step(1);
+        });
+        let x0 = null;
+        $('#lbStage').addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; }, { passive: true });
+        $('#lbStage').addEventListener('touchend', (e) => {
+          if (x0 === null) return;
+          const dx = e.changedTouches[0].clientX - x0;
+          if (Math.abs(dx) > 50) step(dx < 0 ? 1 : -1);
+          x0 = null;
+        });
+        loadGallery(true);
+        setInterval(() => {
+          if (document.visibilityState === 'visible' && !running && $('#lb').hidden) loadGallery(true);
+        }, 60000);
+      }
+
+      async function loadGallery(reset, fresh) {
+        if (gal.loading) return;
+        gal.loading = true;
+        $('#galRefresh').disabled = true;
+        try {
+          const r = await call('gallery', { pageToken: reset ? null : gal.next, fresh: !!fresh });
+          if (reset) {
+            if (!gal.items.length) {
+              gal.items = r.items;
+              gal.next = r.next;
+            } else {
+              const known = new Set(gal.items.map((i) => i.id));
+              gal.items = r.items.filter((i) => !known.has(i.id)).concat(gal.items);
+            }
+          } else {
+            const known = new Set(gal.items.map((i) => i.id));
+            gal.items = gal.items.concat(r.items.filter((i) => !known.has(i.id)));
+            gal.next = r.next;
+          }
+          renderGallery();
+        } catch (e) {
+          if (!gal.items.length) {
+            $('#galEmpty').hidden = false;
+            $('#galEmpty').textContent = 'Die Galerie konnte nicht geladen werden. Tippe auf „Aktualisieren“.';
+          }
+        }
+        gal.loading = false;
+        $('#galRefresh').disabled = false;
+      }
+
+      function thumbUrl(id, w) { return 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(id) + '&sz=w' + w; }
+
+      function renderGallery() {
+        const grid = $('#grid');
+        const existing = new Map(Array.from(grid.children).map((el) => [el.dataset.id, el]));
+        const frag = document.createDocumentFragment();
+        gal.items.forEach((item, i) => {
+          let tile = existing.get(item.id);
+          if (!tile) {
+            tile = document.createElement('button');
+            tile.type = 'button';
+            tile.className = 'tile';
+            tile.dataset.id = item.id;
+            tile.setAttribute('aria-label', (item.video ? 'Video' : 'Foto') + (item.guest ? ' von ' + item.guest : '') + ' ansehen');
+            const img = document.createElement('img');
+            img.alt = '';
+            img.loading = 'lazy';
+            img.referrerPolicy = 'no-referrer';
+            img.onerror = () => {
+              img.remove();
+              const ph = document.createElement('span');
+              ph.className = 'ph';
+              ph.innerHTML = item.video ? ICON_VIDEO : ICON_PHOTO;
+              tile.prepend(ph);
+            };
+            img.src = thumbUrl(item.id, 400);
+            tile.appendChild(img);
+            if (item.video) {
+              const play = document.createElement('span');
+              play.className = 'play';
+              play.innerHTML = ICON_PLAY;
+              tile.appendChild(play);
+            }
+          }
+          tile.onclick = () => openLightbox(i);
+          frag.appendChild(tile);
+        });
+        grid.replaceChildren(frag);
+
+        const n = gal.items.length;
+        $('#galCount').textContent = n ? n + (gal.next ? '+' : '') + (n === 1 ? ' Datei' : ' Dateien') : '';
+        $('#galEmpty').hidden = n > 0;
+        if (!n) $('#galEmpty').textContent = CFG.state === 'open'
+          ? 'Noch ist hier nichts zu sehen. Die ersten Fotos erscheinen, sobald jemand etwas teilt.'
+          : 'Es wurden keine Fotos oder Videos geteilt.';
+        $('#galMore').hidden = !gal.next;
+      }
+
+      function openLightbox(i) {
+        gal.index = i;
+        $('#lb').hidden = false;
+        document.body.style.overflow = 'hidden';
+        showCurrent();
+        $('#lbClose').focus();
+      }
+
+      function closeLightbox() {
+        $('#lb').hidden = true;
+        $('#lbStage').replaceChildren();
+        document.body.style.overflow = '';
+        const tile = $('#grid').children[gal.index];
+        if (tile) tile.focus();
+      }
+
+      function step(d) {
+        const n = gal.items.length;
+        if (!n) return;
+        gal.index = (gal.index + d + n) % n;
+        showCurrent();
+        if (gal.index >= n - 3 && gal.next) loadGallery(false);
+      }
+
+      function showCurrent() {
+        const item = gal.items[gal.index];
+        if (!item) return;
+        const stage = $('#lbStage');
+        const loading = document.createElement('span');
+        loading.className = 'loading';
+        loading.textContent = 'Wird geladen …';
+        if (item.video) {
+          const fr = document.createElement('iframe');
+          fr.src = 'https://drive.google.com/file/d/' + encodeURIComponent(item.id) + '/preview';
+          fr.allow = 'autoplay; fullscreen';
+          fr.title = 'Video';
+          stage.replaceChildren(fr);
+        } else {
+          const img = document.createElement('img');
+          img.alt = item.guest ? 'Foto von ' + item.guest : 'Foto';
+          img.referrerPolicy = 'no-referrer';
+          img.onload = () => loading.remove();
+          img.onerror = () => { loading.textContent = 'Vorschau noch nicht verfügbar. Herunterladen geht trotzdem.'; };
+          img.src = thumbUrl(item.id, 1600);
+          stage.replaceChildren(loading, img);
+        }
+        $('#lbDl').href = 'https://drive.google.com/uc?export=download&id=' + encodeURIComponent(item.id);
+        const when = item.time ? new Date(item.time).toLocaleString('de-DE', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }) : '';
+        $('#lbCap').textContent = [item.guest, when].filter(Boolean).join(', ') + '   ' + (gal.index + 1) + ' / ' + gal.items.length + (gal.next ? '+' : '');
+        // nächstes Bild vorladen
+        const nextItem = gal.items[(gal.index + 1) % gal.items.length];
+        if (nextItem && !nextItem.video) { const pre = new Image(); pre.referrerPolicy = 'no-referrer'; pre.src = thumbUrl(nextItem.id, 1600); }
+      }
+
+      // =====================================================
+      //  Hilfsfunktionen
+      // =====================================================
+      // Anfrage an das Apps Script. Bewusst ohne Cookies und als einfache Anfrage,
+      // damit es egal ist, mit welchen Google-Konten jemand angemeldet ist.
+      async function call(action, params) {
+        let res;
+        try {
+          res = await fetch(SETTINGS.API_URL, {
+            method: 'POST',
+            body: JSON.stringify(Object.assign({ action: action, key: KEY }, params || {})),
+            credentials: 'omit',
+            redirect: 'follow'
+          });
+        } catch (e) {
+          throw new Error('Netzwerkfehler');
+        }
+        const text = await res.text();
+        let data;
+        try { data = JSON.parse(text); }
+        catch (e) { throw new Error('Der Server hat unerwartet geantwortet (' + res.status + ').'); }
+        if (!data.ok) throw Object.assign(new Error(data.error || 'Unbekannter Fehler'), { user: !!data.user });
+        return data.result;
+      }
+
+      function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
+
+      async function retry(fn, tries = 5) {
+        let delay = 1500;
+        for (let i = 0; ; i++) {
+          try { return await fn(); }
+          catch (e) {
+            if ((e && e.user) || i >= tries - 1) throw e;
+            await sleep(delay);
+            delay *= 2;
+          }
+        }
+      }
+
+      function cleanMsg(e) {
+        const raw = String((e && e.message) || e || '');
+        if (e && e.user) return raw;
+        if (/NetworkError|HTTP 0|Failed to fetch|Netzwerkfehler/i.test(raw)) {
+          return 'Keine Verbindung. Prüfe dein Internet und versuche es erneut.';
+        }
+        const detail = raw.replace(/^(Exception|Error|ScriptError):\s*/i, '').slice(0, 160);
+        return 'Fehlgeschlagen: ' + (detail || 'unbekannter Fehler');
+      }
+
+      function readB64(blob) {
+        return new Promise((resolve, reject) => {
+          const r = new FileReader();
+          r.onload = () => resolve(String(r.result).split(',')[1] || '');
+          r.onerror = () => reject(r.error);
+          r.readAsDataURL(blob);
+        });
+      }
+
+      function fmtSize(b) {
+        if (b < 1024 * 1024) return Math.max(1, Math.round(b / 1024)) + ' KB';
+        return (b / 1024 / 1024).toFixed(b < 100 * 1024 * 1024 ? 1 : 0).replace('.', ',') + ' MB';
+      }
+
+      async function keepAwake(on) {
+        try {
+          if (on && 'wakeLock' in navigator && !wakeLock) {
+            wakeLock = await navigator.wakeLock.request('screen');
+            wakeLock.addEventListener('release', () => { wakeLock = null; });
+          } else if (!on && wakeLock) {
+            await wakeLock.release();
+            wakeLock = null;
+          }
+        } catch (e) { /* nicht überall verfügbar */ }
+      }
+      // =====================================================
+      //  Start (erst hier, nachdem alle Variablen angelegt sind)
+      // =====================================================
+      async function boot() {
+        $('#loading').hidden = false;
+        $('#notice').hidden = true;
+        try {
+          CFG = await retry(() => call('info'), 3);
+        } catch (e) {
+          $('#loading').hidden = true;
+          showNotice('Die Seite konnte gerade nicht geladen werden. ' + (e && e.user ? e.message : 'Prüfe deine Verbindung.'));
+          const b = document.createElement('button');
+          b.className = 'linkbtn'; b.type = 'button'; b.textContent = 'Erneut versuchen';
+          b.style.display = 'block'; b.style.margin = '0.75rem auto 0';
+          b.onclick = boot;
+          $('#notice').appendChild(b);
+          return;
+        }
+        $('#loading').hidden = true;
+
+        if (CFG.state === 'denied') {
+          showNotice('Dieser Link ist unvollständig. Bitte scanne den QR-Code auf der Karte erneut.');
+          $('#privacy').hidden = true;
+          return;
+        }
+        if (CFG.state === 'closed') {
+          showNotice(CFG.showGallery
+            ? 'Uploads sind geschlossen. Danke an alle, die ihre Fotos und Videos geteilt haben! Hier könnt ihr sie weiterhin ansehen und herunterladen.'
+            : 'Die Upload-Seite ist geschlossen. Danke an alle, die ihre Fotos und Videos geteilt haben!');
+        } else {
+          $('#uploader').hidden = false;
+          initUploader();
+        }
+        if (CFG.showGallery) initGallery();
+      }
+      boot();
+    })();
+  </script>
+</body>
+</html>
