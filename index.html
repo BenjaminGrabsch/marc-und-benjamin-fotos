@@ -7,166 +7,204 @@
   <meta name="description" content="Teilt eure Fotos und Videos mit uns.">
   <meta property="og:title" content="Marc &amp; Benjamin">
   <meta property="og:description" content="Teilt eure Fotos und Videos mit uns.">
-  <meta name="theme-color" content="#F2F3EF" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#131918" media="(prefers-color-scheme: dark)">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
+  <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1C1B18" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤍</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Gloock&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&family=Sacramento&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #F2F3EF;
+      --bg: #FFFFFF;
       --card: #FFFFFF;
-      --ink: #1E2B2A;
-      --muted: #5E6A67;
-      --line: #DCE0D9;
-      --accent: #2F5D50;
-      --on-accent: #FFFFFF;
-      --ok: #2F7D4F;
-      --err: #B3261E;
-      --display: 'Gloock', Georgia, 'Times New Roman', serif;
-      --body: 'Figtree', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --ink: #1E1D1B;
+      --muted: #6B665E;
+      --line: #EAE3D6;
+      --gold: #C08A35;
+      --gold-soft: #E9D9BB;
+      --ok: #6F7349;
+      --err: #A8322A;
+      --script: 'Sacramento', 'Brush Script MT', cursive;
+      --serif: 'EB Garamond', Garamond, Georgia, 'Times New Roman', serif;
     }
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #131918; --card: #1B2321; --ink: #E7ECE9; --muted: #9CA8A4;
-        --line: #2B3533; --ok: #6BC28F; --err: #F2968F;
+        --bg: #1C1B18; --card: #24221E; --ink: #EEE8DD; --muted: #A79F92;
+        --line: #38342D; --gold: #D4A24E; --gold-soft: #5A4A2E; --ok: #A9AE7F; --err: #F0988F;
       }
     }
     * { box-sizing: border-box; }
     html, body { margin: 0; }
     body {
       background: var(--bg); color: var(--ink);
-      font: 16px/1.55 var(--body); -webkit-font-smoothing: antialiased;
+      font: 17px/1.6 var(--serif); -webkit-font-smoothing: antialiased;
     }
     [hidden] { display: none !important; }
     button { font: inherit; color: inherit; }
 
+    /* Karte mit goldenem Rahmen wie auf dem Papier */
     .wrap {
-      max-width: 34rem; margin: 0 auto;
-      padding: calc(1.25rem + env(safe-area-inset-top, 0px)) calc(1.25rem + env(safe-area-inset-right, 0px))
-               calc(3rem + env(safe-area-inset-bottom, 0px)) calc(1.25rem + env(safe-area-inset-left, 0px));
+      max-width: 36rem; margin: 0 auto;
+      padding: calc(0.6rem + env(safe-area-inset-top, 0px)) calc(0.6rem + env(safe-area-inset-right, 0px))
+               calc(0.6rem + env(safe-area-inset-bottom, 0px)) calc(0.6rem + env(safe-area-inset-left, 0px));
+    }
+    .sheet {
+      position: relative; overflow: hidden;
+      border: 1px solid var(--gold);
+      padding: 3.25rem 1.25rem 8rem;
+      min-height: calc(100vh - 1.2rem);
+    }
+    @supports (min-height: 100svh) { .sheet { min-height: calc(100svh - 1.2rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); } }
+    .sheet > * { position: relative; z-index: 1; }
+    .branch { position: absolute; z-index: 0; pointer-events: none; width: 6rem; height: 12rem; }
+    .branch.tl { left: 0.35rem; top: -1.9rem; }
+    .branch.br { right: 0.35rem; bottom: -1.9rem; transform: rotate(180deg); }
+    @media (min-width: 30rem) {
+      .sheet { padding: 3.75rem 2.5rem 9rem; }
+      .branch { width: 7.5rem; height: 15rem; }
     }
 
     .hero-img {
       display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover;
-      border-radius: 1.25rem; margin-bottom: 1.75rem;
+      margin-bottom: 2rem; border: 1px solid var(--gold-soft);
     }
     header { text-align: center; }
+    .caps {
+      text-transform: uppercase; letter-spacing: 0.22em; font-weight: 500;
+    }
+    .eyebrow { font-size: 0.95rem; margin: 0; padding-left: 0.22em; }
     h1 {
-      font: 400 clamp(2.4rem, 11vw, 3.4rem)/1.05 var(--display);
-      letter-spacing: -0.01em; margin: 0.5rem 0 0.6rem; text-wrap: balance;
+      font: 400 clamp(4rem, 21vw, 5.6rem)/0.95 var(--script);
+      -webkit-text-stroke: 0.6px currentColor;
+      margin: 0.1rem 0 0.2rem;
     }
-    .sub { color: var(--muted); margin: 0 0 1rem; font-weight: 500; }
-    .welcome { margin: 0 auto; max-width: 26rem; text-wrap: pretty; }
+    .rule {
+      display: flex; align-items: center; justify-content: center; gap: 0.75rem;
+      color: var(--gold); margin: 0.4rem auto 1.4rem; max-width: 22rem;
+    }
+    .rule::before, .rule::after { content: ''; flex: 1; height: 1.5px; background: var(--gold); }
+    .rule svg { width: 1.05rem; height: 1.05rem; flex: none; }
+    .welcome {
+      margin: 0 auto; max-width: 25rem; font-size: 0.92rem; line-height: 1.75;
+      letter-spacing: 0.12em; text-wrap: balance;
+    }
 
-    .field { margin: 2rem auto 0; max-width: 30rem; }
-    .field label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.4rem; }
-    .field input {
-      width: 100%; font: inherit; font-size: 1rem; padding: 0.8rem 1rem;
-      border-radius: 0.75rem; border: 1px solid var(--line);
-      background: var(--card); color: var(--ink);
-    }
-    .field input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+    .script-gold { font: 400 2.4rem/1.1 var(--script); color: var(--gold); -webkit-text-stroke: 0.3px currentColor; }
 
     /* Auslöser-Knopf mit Fortschrittsring */
     .sr { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; clip: rect(0 0 0 0); }
     .picker {
       display: flex; flex-direction: column; align-items: center; text-align: center;
-      margin-top: 2.25rem; cursor: pointer; -webkit-tap-highlight-color: transparent;
+      margin-top: 2.5rem; cursor: pointer; -webkit-tap-highlight-color: transparent;
     }
-    .shutter { position: relative; width: 11.5rem; height: 11.5rem; }
+    .shutter { position: relative; width: 10.5rem; height: 10.5rem; }
     .ringsvg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
-    .ring-bg { fill: none; stroke: var(--line); stroke-width: 5; }
-    .ring { fill: none; stroke: var(--accent); stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 0.25s linear; }
+    .ring-bg { fill: none; stroke: var(--gold-soft); stroke-width: 2; }
+    .ring { fill: none; stroke: var(--gold); stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.25s linear; }
     .core {
-      position: absolute; inset: 13px; border-radius: 50%;
-      background: var(--accent); color: var(--on-accent);
+      position: absolute; inset: 14px; border-radius: 50%;
+      background: var(--card); color: var(--ink);
+      border: 1px solid var(--gold);
       display: grid; place-items: center;
-      box-shadow: inset 0 0 0 7px rgba(255, 255, 255, 0.13);
-      transition: transform 0.15s ease;
+      transition: transform 0.15s ease, background 0.2s ease;
     }
+    .picker:hover .core { background: color-mix(in srgb, var(--gold) 6%, var(--card)); }
     .picker:active .core { transform: scale(0.96); }
-    #file:focus-visible + .picker .core { outline: 3px solid var(--ink); outline-offset: 5px; }
-    .core svg { width: 3rem; height: 3rem; }
-    .pct { font: 400 2.2rem/1 var(--display); font-variant-numeric: tabular-nums; }
-    .pick-label { font-weight: 600; font-size: 1.1rem; margin-top: 1.1rem; }
-    .pick-hint { color: var(--muted); font-size: 0.9rem; }
+    #file:focus-visible + .picker .core { outline: 2px solid var(--gold); outline-offset: 6px; }
+    .core svg { width: 3.4rem; height: 3.4rem; }
+    .pct { font: 500 2rem/1 var(--serif); color: var(--gold); font-variant-numeric: tabular-nums; }
+    .pick-label { margin-top: 0.9rem; }
+    .pick-hint { color: var(--muted); font-size: 0.98rem; }
+
+    .field { margin: 2rem auto 0; max-width: 18rem; text-align: center; }
+    .field label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 0.1rem; }
+    .field input {
+      width: 100%; font: inherit; font-size: 1.15rem; text-align: center; padding: 0.4rem 0.25rem;
+      border: 0; border-bottom: 1px solid var(--gold); border-radius: 0;
+      background: transparent; color: var(--ink);
+    }
+    .field input::placeholder { color: var(--muted); opacity: 0.6; font-style: italic; }
+    .field input:focus { outline: none; border-bottom-width: 2px; padding-bottom: calc(0.4rem - 1px); }
 
     .status { text-align: center; min-height: 1.5em; margin: 1.25rem 0 0; color: var(--muted); text-wrap: balance; }
-    .status.done { color: var(--ink); font-weight: 600; }
+    .status.done { color: var(--ink); font-weight: 500; }
 
     /* Upload-Liste */
-    .list { list-style: none; padding: 0; margin: 1.75rem 0 0; display: grid; gap: 0.5rem; }
+    .list { list-style: none; padding: 0; margin: 1.5rem 0 0; display: grid; gap: 0.5rem; }
     .item {
-      display: grid; grid-template-columns: 3.25rem 1fr; gap: 0.85rem; align-items: center;
-      background: var(--card); border: 1px solid var(--line); border-radius: 0.9rem; padding: 0.6rem;
+      display: grid; grid-template-columns: 3.1rem 1fr; gap: 0.85rem; align-items: center;
+      background: var(--card); border: 1px solid var(--line); padding: 0.5rem;
     }
     .thumb {
-      width: 3.25rem; height: 3.25rem; border-radius: 0.55rem; overflow: hidden;
+      width: 3.1rem; height: 3.1rem; overflow: hidden;
       background: var(--line); color: var(--muted); display: grid; place-items: center;
     }
     .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .thumb svg { width: 1.5rem; height: 1.5rem; }
     .meta { min-width: 0; }
-    .name { font-weight: 500; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .bar { height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; margin: 0.4rem 0 0.3rem; }
-    .bar span { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.25s linear; }
-    .state { font-size: 0.82rem; color: var(--muted); display: flex; justify-content: space-between; gap: 0.5rem; font-variant-numeric: tabular-nums; }
+    .name { font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bar { height: 2px; background: var(--line); overflow: hidden; margin: 0.35rem 0 0.25rem; }
+    .bar span { display: block; height: 100%; width: 0; background: var(--gold); transition: width 0.25s linear; }
+    .state { font-size: 0.85rem; color: var(--muted); display: flex; justify-content: space-between; gap: 0.5rem; font-variant-numeric: tabular-nums; }
     .item.ok .bar span { background: var(--ok); }
     .item.ok .state { color: var(--ok); }
     .item.err .state, .item.bad .state { color: var(--err); }
     .linkbtn {
-      font-weight: 600; color: var(--accent); background: none; border: 0; padding: 0;
-      cursor: pointer; text-decoration: underline; white-space: nowrap;
+      color: var(--gold); background: none; border: 0; padding: 0; cursor: pointer;
+      text-decoration: underline; text-underline-offset: 0.2em; white-space: nowrap;
     }
+    .linkbtn:disabled { opacity: 0.5; cursor: default; }
 
     .notice {
-      margin-top: 2rem; padding: 1.25rem; text-align: center;
-      background: var(--card); border: 1px solid var(--line); border-radius: 1rem;
+      margin: 2.5rem auto 0; max-width: 26rem; padding: 1.25rem 1rem; text-align: center;
+      border-top: 1px solid var(--gold-soft); border-bottom: 1px solid var(--gold-soft);
     }
 
     /* Galerie */
-    .gallery { margin-top: 3.5rem; }
-    .gal-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
-    .gal-head h2 { font: 400 2rem/1.1 var(--display); margin: 0; }
-    .gal-count { color: var(--muted); font-size: 0.9rem; }
-    .gal-actions { display: flex; gap: 1.25rem; margin: 0.6rem 0 1rem; flex-wrap: wrap; font-size: 0.92rem; }
-    .gal-actions a { color: var(--accent); font-weight: 600; }
-    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; border-radius: 0.9rem; overflow: hidden; }
+    .gallery { margin-top: 3.25rem; }
+    .gal-head { text-align: center; }
+    .gal-head h2 { margin: 0; font-size: 3rem; }
+    .gal-count { color: var(--muted); font-size: 0.95rem; }
+    .gal-actions { display: flex; justify-content: center; gap: 1.5rem; margin: 0.3rem 0 1.1rem; flex-wrap: wrap; font-size: 0.95rem; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
     @media (min-width: 30rem) { .grid { grid-template-columns: repeat(4, 1fr); } }
     .tile {
       position: relative; aspect-ratio: 1; padding: 0; border: 0; cursor: pointer;
       background: var(--line); display: block; overflow: hidden;
     }
     .tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .tile:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+    .tile:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
     .tile .ph { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); }
     .tile .ph svg { width: 1.6rem; height: 1.6rem; }
     .tile .play {
       position: absolute; right: 6px; bottom: 6px; width: 1.7rem; height: 1.7rem; border-radius: 50%;
-      background: rgba(0, 0, 0, 0.55); color: #fff; display: grid; place-items: center;
+      background: rgba(0, 0, 0, 0.5); color: #fff; display: grid; place-items: center;
     }
     .tile .play svg { width: 0.8rem; height: 0.8rem; margin-left: 2px; }
-    .gal-empty { color: var(--muted); text-align: center; padding: 2rem 1rem; background: var(--card); border: 1px dashed var(--line); border-radius: 0.9rem; }
+    .gal-empty { color: var(--muted); text-align: center; padding: 1.75rem 1rem; border: 1px dashed var(--gold-soft); margin: 0; }
     .more {
-      display: block; margin: 1.25rem auto 0; padding: 0.7rem 1.4rem; border-radius: 999px;
-      border: 1px solid var(--line); background: var(--card); font-weight: 600; cursor: pointer;
+      display: block; margin: 1.5rem auto 0; padding: 0.6rem 1.6rem; border-radius: 999px;
+      border: 1px solid var(--gold); background: transparent; color: var(--gold); cursor: pointer;
     }
+
+    footer { text-align: center; margin-top: 3rem; }
+    .sign { font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.7rem; flex-wrap: wrap; justify-content: center; }
+    .sign svg { width: 0.9rem; height: 0.9rem; color: var(--gold); }
+    .privacy { font-size: 0.82rem; color: var(--muted); margin: 1rem auto 0; max-width: 24rem; }
 
     /* Vollbildansicht */
     .lb {
-      position: fixed; inset: 0; z-index: 10; background: rgba(8, 12, 11, 0.95); color: #fff;
+      position: fixed; inset: 0; z-index: 10; background: rgba(14, 13, 11, 0.95); color: #fff;
       display: grid; grid-template-rows: auto 1fr auto;
     }
     .lb-top, .lb-bottom { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.75rem 1rem; }
     .lb-top { padding-top: calc(0.75rem + env(safe-area-inset-top, 0px)); }
     .lb-bottom { padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px)); }
-    .lb-cap { font-size: 0.9rem; opacity: 0.85; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .lb-cap { font-size: 0.95rem; opacity: 0.85; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .lb-stage { position: relative; display: grid; place-items: center; min-height: 0; overflow: hidden; }
     .lb-stage img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
     .lb-stage iframe { width: min(100%, 60rem); height: 100%; border: 0; }
-    .lb-stage .loading { position: absolute; opacity: 0.6; font-size: 0.9rem; }
+    .lb-stage .loading { position: absolute; opacity: 0.6; font-size: 0.95rem; }
     .round {
       width: 2.75rem; height: 2.75rem; border-radius: 50%; border: 0; cursor: pointer;
       background: rgba(255, 255, 255, 0.12); color: #fff; display: grid; place-items: center; flex: none;
@@ -174,12 +212,10 @@
     .round svg { width: 1.25rem; height: 1.25rem; }
     .round:focus-visible, .dl:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
     .dl {
-      display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.65rem 1.2rem; border-radius: 999px;
-      background: #fff; color: #111; font-weight: 600; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.3rem; border-radius: 999px;
+      background: #fff; color: #1E1D1B; text-decoration: none;
     }
     .dl svg { width: 1.1rem; height: 1.1rem; }
-
-    .privacy { font-size: 0.8rem; color: var(--muted); text-align: center; margin: 2.5rem auto 0; max-width: 26rem; }
 
     @media (prefers-reduced-motion: reduce) {
       .ring, .bar span, .core { transition: none; }
@@ -187,61 +223,77 @@
   </style>
 </head>
 <body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="branch" viewBox="0 0 140 280"><path d="M22,274 C64,196 28,112 112,14" fill="none" stroke="#6F7349" stroke-width="1.6" stroke-linecap="round"/><g transform="translate(28.8,259.9) rotate(-22.2)"><path d="M0,0 C11.9,-13.5 31.7,-6.7 39.6,0 C31.7,6.7 11.9,13.5 0,0Z" fill="#8A8A5E" opacity=".85"/><path d="M0,0 C11.9,-13.5 31.7,-6.7 39.6,0 Z" fill="#8A8A5E" opacity=".7"/><path d="M1,0 L35.6,0" stroke="#E9E6D3" stroke-width=".6" opacity=".7"/></g><g transform="translate(35.2,242.1) rotate(-123.6)"><path d="M0,0 C12.3,-14.0 32.8,-7.0 41.1,0 C32.8,7.0 12.3,14.0 0,0Z" fill="#C2BD9A" opacity=".85"/><path d="M0,0 C12.3,-14.0 32.8,-7.0 41.1,0 Z" fill="#6F7349" opacity=".7"/><path d="M1,0 L36.9,0" stroke="#E9E6D3" stroke-width=".6" opacity=".7"/></g><g transform="translate(40.0,224.0) rotate(-38.6)"><path d="M0,0 C11.7,-13.3 31.2,-6.6 39.0,0 C31.2,6.6 11.7,13.3 0,0Z" fill="#8A8A5E" opacity=".85"/><path d="M0,0 C11.7,-13.3 31.2,-6.6 39.0,0 Z" fill="#5A603C" opacity=".7"/><path d="M1,0 L35.1,0" stroke="#E9E6D3" stroke-width=".6" opacity=".7"/></g><g transform="translate(43.5,205.7) rotate(-124.2)"><path d="M0,0 C10.2,-11.5 27.2,-5.8 34.0,0 C27.2,5.8 10.2,11.5 0,0Z" fill="#C2BD9A" opacity=".85"/><path d="M0,0 C10.2,-11.5 27.2,-5.8 34.0,0 Z" fill="#5A603C" opacity=".7"/><path d="M1,0 L30.6,0" stroke="#E9E6D3" stroke-width=".6" opacity=".7"/></g><g transform="translate(46.3,187.1) rotate(-41.5)"><path d="M0,0 C11.3,-12.8 30.1,-6.4 37.7,0 C30.1,6.4 11.3,12.8 0,0Z" fill="#8A8A5E" opacity=".85"/><path d="M0,0 C11.3,-12.8 30.1,-6.4 37.7,0 Z" fill="#5A603C" opacity=".7"/><path d="M1,0 L33.9,0" stroke="#E9E6D3" stroke-width=".6" opacity=".7"/></g><g transform="translate(48.8,168.1) rotate(-120.8)"><path d="M0,0 C10.2,-11.6 27.3,-5.8 34.1,0 C27.3,5.8 10.2,11.6 0,0Z" fill="#C2BD9A" opacity=".85"/><path d="M0,0 C10.2,-11.6 27.3,-5.8 34.1,0 Z" fill="#5A603C" opacity=".7"/><path d="M1,0 L30.7,0" stroke="#E9E6D3" stroke-width=".6" opacity=".7"/></g><g transform="translate(51.7,148.9) rotate(-41.0)"><path d="M0,0 C8.7,-9.8 23.1,-4.9 28.9,0 C23.1,4.9 8.7,9.8 0,0Z" fill="#8A8A5E" opacity=".85"/><path d="M0,0 C8.7,-9.8 23.1,-4.9 28.9,0 Z" fill="#5A603C" opacity=".7"/><path d="M1,0 L26.0,0" stroke="#E9E6D3" stroke-width=".6" opacity=".7"/></g><g transform="translate(55.3,129.3) rotate(-114.9)"><path d="M0,0 C8.3,-9.4 22.2,-4.7 27.8,0 C22.2,4.7 8.3,9.4 0,0Z" fill="#8A8A5E" opacity=".85"/><path d="M0,0 C8.3,-9.4 22.2,-4.7 27.8,0 Z" fill="#6F7349" opacity=".7"/><path d="M1,0 L25.0,0" stroke="#E9E6D3" stroke-width=".6" opacity=".7"/></g><g transform="translate(60.2,109.4) rotate(-37.6)"><path d="M0,0 C8.6,-9.7 22.8,-4.9 28.6,0 C22.8,4.9 8.6,9.7 0,0Z" fill="#C2BD9A" opacity=".85"/><path d="M0,0 C8.6,-9.7 22.8,-4.9 28.6,0 Z" fill="#8A8A5E" opacity=".7"/><path d="M1,0 L25.7,0" stroke="#E9E6D3" stroke-width=".6" opacity=".7"/></g><g transform="translate(66.8,89.1) rotate(-108.0)"><path d="M0,0 C8.0,-9.1 21.4,-4.6 26.8,0 C21.4,4.6 8.0,9.1 0,0Z" fill="#8A8A5E" opacity=".85"/><path d="M0,0 C8.0,-9.1 21.4,-4.6 26.8,0 Z" fill="#8A8A5E" opacity=".7"/><path d="M1,0 L24.1,0" stroke="#E9E6D3" stroke-width=".6" opacity=".7"/></g><g transform="translate(75.8,68.4) rotate(-32.0)"><path d="M0,0 C7.4,-8.4 19.8,-4.2 24.8,0 C19.8,4.2 7.4,8.4 0,0Z" fill="#C2BD9A" opacity=".85"/><path d="M0,0 C7.4,-8.4 19.8,-4.2 24.8,0 Z" fill="#5A603C" opacity=".7"/><path d="M1,0 L22.3,0" stroke="#E9E6D3" stroke-width=".6" opacity=".7"/></g><g transform="translate(87.5,47.3) rotate(-95.5)"><path d="M0,0 C6.4,-7.3 17.1,-3.6 21.4,0 C17.1,3.6 6.4,7.3 0,0Z" fill="#C2BD9A" opacity=".85"/><path d="M0,0 C6.4,-7.3 17.1,-3.6 21.4,0 Z" fill="#8A8A5E" opacity=".7"/><path d="M1,0 L19.3,0" stroke="#E9E6D3" stroke-width=".6" opacity=".7"/></g><g transform="translate(102.5,25.7) rotate(-22.5)"><path d="M0,0 C6.1,-6.9 16.1,-3.4 20.2,0 C16.1,3.4 6.1,6.9 0,0Z" fill="#A7A37C" opacity=".85"/><path d="M0,0 C6.1,-6.9 16.1,-3.4 20.2,0 Z" fill="#8A8A5E" opacity=".7"/><path d="M1,0 L18.2,0" stroke="#E9E6D3" stroke-width=".6" opacity=".7"/></g><g transform="translate(112,14) rotate(-62)"><path d="M0,0 C6,-5 15,-4 20,0 C15,4 6,5 0,0Z" fill="#6F7349" opacity=".85"/></g><circle cx="66.2" cy="92.2" r="1.0" fill="#C08A35" opacity=".55"/><circle cx="108.0" cy="57.2" r="1.2" fill="#C08A35" opacity=".55"/><circle cx="79.5" cy="112.1" r="1.3" fill="#C08A35" opacity=".55"/><circle cx="90.9" cy="55.4" r="1.4" fill="#C08A35" opacity=".55"/><circle cx="46.5" cy="111.8" r="1.9" fill="#C08A35" opacity=".55"/><circle cx="72.2" cy="242.0" r="0.9" fill="#C08A35" opacity=".55"/><circle cx="85.8" cy="205.7" r="1.8" fill="#C08A35" opacity=".55"/><circle cx="64.0" cy="113.5" r="1.4" fill="#C08A35" opacity=".55"/><circle cx="109.7" cy="54.4" r="0.9" fill="#C08A35" opacity=".55"/><path transform="translate(4,128) rotate(-14)" d="M14,26 C4,18 -2,11 1,5 C4,-1 11,0 14,6 C17,0 24,-1 27,5 C30,11 24,18 14,26Z" fill="none" stroke="#C08A35" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+    <symbol id="heart" viewBox="0 0 24 24"><path d="M12 20.5C6.5 16.6 3 13.2 3 9.3 3 6.6 5 4.8 7.4 4.8c1.9 0 3.6 1.1 4.6 2.8 1-1.7 2.7-2.8 4.6-2.8C19 4.8 21 6.6 21 9.3c0 3.9-3.5 7.3-9 11.2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  </svg>
+
   <main class="wrap">
-    <img id="hero" class="hero-img" alt="" hidden>
-    <header>
-      <h1 id="title"></h1>
-      <p id="subtitle" class="sub"></p>
-      <p id="welcome" class="welcome"></p>
-    </header>
+    <div class="sheet">
+      <svg class="branch tl" aria-hidden="true"><use href="#branch"/></svg>
+      <svg class="branch br" aria-hidden="true"><use href="#branch"/></svg>
 
-    <p id="notice" class="notice" hidden></p>
-    <p id="loading" class="status" hidden>Wird geladen …</p>
+      <img id="hero" class="hero-img" alt="" hidden>
+      <header>
+        <p id="eyebrow" class="eyebrow caps"></p>
+        <h1 id="title"></h1>
+        <div class="rule" aria-hidden="true"><svg><use href="#heart"/></svg></div>
+        <p id="welcome" class="welcome caps"></p>
+      </header>
 
-    <section id="uploader" hidden>
-      <div id="nameField" class="field">
-        <label for="guest">Dein Name (optional)</label>
-        <input id="guest" type="text" autocomplete="name" maxlength="60" placeholder="z. B. Tante Gabi">
-      </div>
+      <p id="notice" class="notice" hidden></p>
+      <p id="loading" class="status" hidden>Wird geladen …</p>
 
-      <input id="file" class="sr" type="file" accept="image/*,video/*" multiple>
-      <label for="file" class="picker">
-        <span class="shutter">
-          <svg class="ringsvg" viewBox="0 0 200 200" aria-hidden="true">
-            <circle class="ring-bg" cx="100" cy="100" r="94"></circle>
-            <circle id="ring" class="ring" cx="100" cy="100" r="94"></circle>
-          </svg>
-          <span class="core">
-            <svg id="coreIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.8l1.4-2h4.6l1.4 2h1.8A2.5 2.5 0 0 1 20 8.5v8A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5z"/>
-              <circle cx="12" cy="12.5" r="3.5"/>
+      <section id="uploader" hidden>
+        <input id="file" class="sr" type="file" accept="image/*,video/*" multiple>
+        <label for="file" class="picker">
+          <span class="shutter">
+            <svg class="ringsvg" viewBox="0 0 200 200" aria-hidden="true">
+              <circle class="ring-bg" cx="100" cy="100" r="96"></circle>
+              <circle id="ring" class="ring" cx="100" cy="100" r="96"></circle>
             </svg>
-            <span id="corePct" class="pct" hidden></span>
+            <span class="core">
+              <svg id="coreIcon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M6 16.5a3 3 0 0 1 3-3h6.2l2.6-4h12.4l2.6 4H39a3 3 0 0 1 3 3V36a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3z"/>
+                <circle cx="24" cy="26" r="8.5"/>
+                <path d="M10.5 18.5h4"/>
+                <path d="M24 30.2c-2.6-1.8-4.2-3.4-4.2-5.2 0-1.3 1-2.2 2.1-2.2.9 0 1.6.5 2.1 1.3.5-.8 1.2-1.3 2.1-1.3 1.2 0 2.1.9 2.1 2.2 0 1.8-1.6 3.4-4.2 5.2z" stroke="var(--gold)" stroke-width="1.3"/>
+              </svg>
+              <span id="corePct" class="pct" hidden></span>
+            </span>
           </span>
-        </span>
-        <span class="pick-label">Fotos &amp; Videos auswählen</span>
-        <span class="pick-hint">Du kannst mehrere auf einmal auswählen</span>
-      </label>
+          <span class="pick-label script-gold">Fotos teilen</span>
+          <span class="pick-hint">Fotos und Videos auswählen, gern mehrere auf einmal</span>
+        </label>
 
-      <p id="status" class="status" role="status" aria-live="polite"></p>
-      <ul id="list" class="list"></ul>
-    </section>
+        <div id="nameField" class="field">
+          <label for="guest">Von wem sind die Fotos? (optional)</label>
+          <input id="guest" type="text" autocomplete="name" maxlength="60" placeholder="z. B. Tante Gabi">
+        </div>
 
-    <section id="gallery" class="gallery" hidden aria-labelledby="galTitle">
-      <div class="gal-head">
-        <h2 id="galTitle">Galerie</h2>
-        <span id="galCount" class="gal-count"></span>
-      </div>
-      <div class="gal-actions">
-        <button id="galRefresh" class="linkbtn" type="button">Aktualisieren</button>
-        <a id="galFolder" href="#" target="_blank" rel="noopener" hidden>Alle in Google Drive öffnen</a>
-      </div>
-      <div id="grid" class="grid"></div>
-      <p id="galEmpty" class="gal-empty" hidden></p>
-      <button id="galMore" class="more" type="button" hidden>Mehr anzeigen</button>
-    </section>
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+        <ul id="list" class="list"></ul>
+      </section>
 
-    <p id="privacy" class="privacy"></p>
+      <section id="gallery" class="gallery" hidden aria-labelledby="galTitle">
+        <div class="gal-head">
+          <h2 id="galTitle" class="script-gold">Galerie</h2>
+          <span id="galCount" class="gal-count"></span>
+        </div>
+        <div class="gal-actions">
+          <button id="galRefresh" class="linkbtn" type="button">Aktualisieren</button>
+          <a id="galFolder" class="linkbtn" href="#" target="_blank" rel="noopener" hidden>Alle in Google Drive öffnen</a>
+        </div>
+        <div id="grid" class="grid"></div>
+        <p id="galEmpty" class="gal-empty" hidden></p>
+        <button id="galMore" class="more" type="button" hidden>Mehr anzeigen</button>
+      </section>
+
+      <footer>
+        <p class="sign caps"><span id="names"></span><svg aria-hidden="true"><use href="#heart"/></svg><span id="date"></span></p>
+        <p id="privacy" class="privacy"></p>
+      </footer>
+    </div>
   </main>
 
   <div id="lb" class="lb" role="dialog" aria-modal="true" aria-label="Foto ansehen" hidden>
@@ -274,12 +326,13 @@
       // /exec-Adresse eures Apps Scripts
       API_URL: 'https://script.google.com/macros/s/AKfycby8XRc9-Tjojh_iv_2AA2gPiyBz8rhiisTiEO2WSbngloZkg3nK5CQU649Yq8msMI_d/exec',
 
-      TITLE: 'Marc & Benjamin',
-      SUBTITLE: 'Unser großer Tag',
-      WELCOME: 'Teilt eure schönsten Momente mit uns. Einfach Fotos und Videos auswählen, der Rest passiert automatisch.',
-      PRIVACY: 'Hochgeladene Fotos und Videos sind für alle sichtbar, die diese Seite öffnen, und können dort heruntergeladen werden. Mit dem Hochladen bist du damit einverstanden.',
+      EYEBROW: 'Unser',
+      TITLE: 'Fotoalbum',
+      WELCOME: 'Teilt eure schönsten Momente mit uns! Einfach Fotos und Videos auswählen, der Rest passiert von allein.',
+      NAMES: 'Marc & Benjamin',
+      DATE: '17.10.26',
+      PRIVACY: 'Hochgeladene Fotos und Videos sind für alle sichtbar, die diese Seite mit dem Link von der Karte öffnen, und können dort heruntergeladen werden. Mit dem Hochladen bist du damit einverstanden.',
 
-      ACCENT: '#2F5D50',          // Hauptfarbe
       HERO_IMAGE: '',             // optional: Dateiname eines Titelbilds im selben Repository, z. B. 'titelbild.jpg'
       ASK_FOR_NAME: true          // optionales Namensfeld anzeigen
     };
@@ -289,18 +342,26 @@
 
     (function () {
       const $ = (s) => document.querySelector(s);
-      const C = 2 * Math.PI * 94;
+      const C = 2 * Math.PI * 96;
       const ICON_PHOTO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="m20.5 16-4.8-4.8L7 19.5"/></svg>';
       const ICON_VIDEO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2.5"/><path d="m16 10.5 5-3v9l-5-3z"/></svg>';
       const ICON_PLAY = '<svg viewBox="0 0 10 12" fill="currentColor"><path d="M0 0v12l10-6z"/></svg>';
 
+      // ---------- Zugangsschlüssel: aus dem Link lesen, merken, aus der Adresszeile entfernen ----------
+      let KEY = new URLSearchParams(location.search).get('k') || '';
+      try {
+        if (KEY) localStorage.setItem('accessKey', KEY);
+        else KEY = localStorage.getItem('accessKey') || '';
+      } catch (e) {}
+      if (location.search) history.replaceState(null, '', location.pathname);
+
       // ---------- Inhalte aus der Konfiguration ----------
-      const KEY = new URLSearchParams(location.search).get('k') || '';
-      document.documentElement.style.setProperty('--accent', SETTINGS.ACCENT);
-      document.title = SETTINGS.TITLE;
+      document.title = SETTINGS.NAMES;
+      $('#eyebrow').textContent = SETTINGS.EYEBROW;
       $('#title').textContent = SETTINGS.TITLE;
-      $('#subtitle').textContent = SETTINGS.SUBTITLE;
       $('#welcome').textContent = SETTINGS.WELCOME;
+      $('#names').textContent = SETTINGS.NAMES;
+      $('#date').textContent = SETTINGS.DATE;
       $('#privacy').textContent = SETTINGS.PRIVACY;
       if (SETTINGS.HERO_IMAGE) { $('#hero').src = SETTINGS.HERO_IMAGE; $('#hero').hidden = false; }
 
@@ -839,6 +900,7 @@
           }
         } catch (e) { /* nicht überall verfügbar */ }
       }
+
       // =====================================================
       //  Start (erst hier, nachdem alle Variablen angelegt sind)
       // =====================================================
@@ -849,7 +911,7 @@
           CFG = await retry(() => call('info'), 3);
         } catch (e) {
           $('#loading').hidden = true;
-          showNotice('Die Seite konnte gerade nicht geladen werden. ' + (e && e.user ? e.message : 'Prüfe deine Verbindung.'));
+          showNotice('Die Seite konnte gerade nicht geladen werden. ' + (e && e.message ? e.message : 'Prüfe deine Verbindung.'));
           const b = document.createElement('button');
           b.className = 'linkbtn'; b.type = 'button'; b.textContent = 'Erneut versuchen';
           b.style.display = 'block'; b.style.margin = '0.75rem auto 0';
